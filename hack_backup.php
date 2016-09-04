@@ -13,7 +13,6 @@
 
 
 </head>
-
 <body>
 	<!-- encasing div wrapper -->
 		<nav class="navbar navbar-inverse">
@@ -71,8 +70,20 @@
 
             </ul>
 
+        </div>
+
+        <div id="events-wrapper">
+            <ul class="sidebar-nav">
+                <b>Events Sidebar</b>
+                <br>
+                <textarea rows="4" cols="50" placeholder="Enter your event"></textarea>
+                <button type=button id="createEvent">Create Event</button>
+                <button type=button id="cancelEvent">Cancel Event</button>
+            </ul>
 
         </div>
+
+
     <div id='map-container'>
 		<div id='map'></div>
 	</div>
@@ -84,8 +95,13 @@
     <script>
         $("#menu-toggle").click( function (e){
             e.preventDefault();
+            if($("#wrapper").hasClass("eventDisplayed")){
+            	$("#wrapper").removeClass("eventDisplayed");
+            }
             $("#wrapper").toggleClass("menuDisplayed");
         });
+
+        $("")
     </script>
 <script>
 	window.map;
@@ -123,10 +139,31 @@
 				map: map,
 				title: 'Surprise Motherfucker'
 			});
+
+			map.setCenter(marker.getPosition());
+			map.setZoom(15);
+
+			if ($("#wrapper").hasClass("eventDisplayed")){
+				$("#wrapper").removeClass("eventDisplayed");
+			}
+			$("#wrapper").toggleClass("eventDisplayed");
+
+			var infowindow = new google.maps.InfoWindow({
+				content: "What's good?"
+			})
+
 			map.setCenter(e.latLng);
 
 			marker.addListener('dblclick', function(){
 				this.setMap(null);
+			});
+
+			marker.addListener('mouseover', function(){
+				infowindow.open(map,marker);
+			});
+
+			marker.addListener('mouseout', function(){
+				infowindow.close();
 			});
 
 		});

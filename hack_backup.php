@@ -76,7 +76,7 @@
             <ul class="sidebar-nav">
                 <b>Events Sidebar</b>
                 <br>
-                <textarea rows="4" cols="50" placeholder="Enter your event"></textarea>
+                <textarea rows="4" cols="50" placeholder="Enter your event" id="eventInfo"></textarea>
                 <button type=button id="createEvent">Create Event</button>
                 <button type=button id="cancelEvent">Cancel Event</button>
             </ul>
@@ -101,21 +101,10 @@
             $("#wrapper").toggleClass("menuDisplayed");
         });
 
-        $("")
     </script>
 <script>
 	window.map;
 	window.kmlUrl = "http://mobile.sheridanc.on.ca/~gjebero/Hackathon/parks.kml"; 
-
-	// " <?php
-
-	// if (isset($_SESSION['sport'])){
-	// 	echo $_SESSION['sport']; 
-
-	// } else
-	// echo "http://mobile.sheridanc.on.ca/~takharp/hackathon/parks.kml";
-	// ?>";
-
 
 	function initMap() {
 		var mapDiv = document.getElementById('map');
@@ -133,40 +122,75 @@
 			google.maps.event.trigger(map, "resize");
 			map.setCenter(center); 
 		});
-		map.addListener('click', function(e){
-			var marker = new google.maps.Marker({
-				position: e.latLng,
-				map: map,
-				title: 'Surprise Motherfucker'
+
+		var lookup = new Array();
+
+		var stopMap = false;
+
+			map.addListener('click', function(e){
+				if (!stopMap){
+					stopMap = true;
+					console.log(e.latLing);
+					var infowindow;
+					lookup.push(new google.maps.Marker({
+						position: e.latLng,
+						map: map
+					}));
+
+					var marker = lookup[lookup.length -1];
+
+					map.setCenter(marker.getPosition());
+					map.setZoom(15);
+
+					if ($("#wrapper").hasClass("eventDisplayed")){
+						$("#wrapper").removeClass("eventDisplayed");
+					}
+					$("#wrapper").toggleClass("eventDisplayed");
+
+					
+					map.setCenter(e.latLng);
+					map.setOptions({draggable: false, keyboardShortcuts: false});
+
+					var cancelButton = document.querySelector("#cancelEvent");
+
+					cancelButton.addEventListener('click', function(){
+						//keeps repearting for a weird reason, have to fix
+						// var markerDelete = lookup[lookup.length - 1];
+						// markerDelete.setMap(null);
+						// lookup.pop();
+						$("#wrapper").removeClass("eventDisplayed");
+						stopMap = false;
+
+					});
+
+					var createButton = document.querySelector("#createEvent");
+
+					createButton.addEventListener('click', function(){
+						$("#wrapper").removeClass("eventDisplayed");
+						stopMap = false;
+						var eventInfo = document.querySelector("#eventInfo").value;
+						infowindow = new google.maps.InfoWindow({
+							content: eventInfo
+						});
+
+						marker.addListener('mouseover', function(){
+							infowindow.open(map,marker);
+						});
+
+						marker.addListener('mouseout', function(){
+							infowindow.close();
+						});
+
+					}, false);
+
+					// marker.addListener('dblclick', function(){
+					// 	this.setMap(null);
+					// });
+
+					
+
+				}
 			});
-
-			map.setCenter(marker.getPosition());
-			map.setZoom(15);
-
-			if ($("#wrapper").hasClass("eventDisplayed")){
-				$("#wrapper").removeClass("eventDisplayed");
-			}
-			$("#wrapper").toggleClass("eventDisplayed");
-
-			var infowindow = new google.maps.InfoWindow({
-				content: "What's good?"
-			})
-
-			map.setCenter(e.latLng);
-
-			marker.addListener('dblclick', function(){
-				this.setMap(null);
-			});
-
-			marker.addListener('mouseover', function(){
-				infowindow.open(map,marker);
-			});
-
-			marker.addListener('mouseout', function(){
-				infowindow.close();
-			});
-
-		});
 	}
 
 </script>
